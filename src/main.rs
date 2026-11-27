@@ -229,23 +229,29 @@ fn main() {
         if f.input.key_pressed(gui::key::UP) && !todo.tasks.is_empty() {
             todo.selected = todo.selected.saturating_sub(1);
         }
-        if f.input.key_pressed(gui::key::DOWN) {
-            if !todo.tasks.is_empty() && todo.selected < todo.tasks.len() - 1 {
-                todo.selected += 1;
-            }
+        if f.input.key_pressed(gui::key::DOWN)
+            && !todo.tasks.is_empty()
+            && todo.selected < todo.tasks.len() - 1
+        {
+            todo.selected += 1;
         }
+
         // SPACE toggles the selected task — but only while the input is
         // empty, so it can still be typed into a task being written.
-        if f.input.key_pressed(gui::key::SPACE) && todo.input.is_empty() {
-            if let Some(t) = todo.tasks.get_mut(todo.selected) {
-                t.1 = !t.1;
-            }
+        if f.input.key_pressed(gui::key::SPACE)
+            && todo.input.is_empty()
+            && let Some(t) = todo.tasks.get_mut(todo.selected)
+        {
+            t.1 = !t.1;
         }
-        if f.input.key_pressed(gui::key::D) && todo.input.is_empty() {
-            if !todo.tasks.is_empty() && todo.selected < todo.tasks.len() {
-                todo.tasks.remove(todo.selected);
-                todo.selected = todo.selected.saturating_sub(1);
-            }
+
+        if f.input.key_pressed(gui::key::D)
+            && todo.input.is_empty()
+            && !todo.tasks.is_empty()
+            && todo.selected < todo.tasks.len()
+        {
+            todo.tasks.remove(todo.selected);
+            todo.selected = todo.selected.saturating_sub(1);
         }
 
         f.text(
