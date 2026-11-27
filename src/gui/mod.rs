@@ -710,7 +710,7 @@ impl Frame {
                 .iter()
                 .map(|v| Vertex::new(v.x * z, v.y * z, Color::rgba(v.r, v.g, v.b, v.a))),
         );
-        let uniform_offset_bytes = self.customs.len() as usize * UNIFORM_CHUNK_FLOATS * 4;
+        let uniform_offset_bytes = self.customs.len();
         if (uniform_offset_bytes as u64 + UNIFORM_CHUNK_FLOATS as u64 * 4) > UNIFORM_BUFFER_BYTES {
             self.verts.truncate(first as usize);
             return;
@@ -1059,11 +1059,12 @@ impl App {
         // `characters` — the same shape a real keyboard layout (or an
         // input method's commit) produces. Key code 0 is arbitrary: the
         // text path reads `characters`, not `keyCode`.
-        if let Some((frame, text)) = &harness.text {
-            if *frame == index && !text.is_empty() {
-                let ev = NSEvent::key_event(EVENT_KEY_DOWN, origin, window, text, 0);
-                self.ns_app.postEvent_atStart(ev.as_ref(), false);
-            }
+        if let Some((frame, text)) = &harness.text
+            && *frame == index
+            && !text.is_empty()
+        {
+            let ev = NSEvent::key_event(EVENT_KEY_DOWN, origin, window, text, 0);
+            self.ns_app.postEvent_atStart(ev.as_ref(), false);
         }
     }
 
