@@ -669,7 +669,11 @@ impl NSPasteboard {
     ///
     /// # Safety
     /// Calls into the Objective-C runtime.
-    pub unsafe fn setString_forType(&self, string: Ref<NSString>, data_type: Ref<NSString>) -> ObjBOOL {
+    pub unsafe fn setString_forType(
+        &self,
+        string: Ref<NSString>,
+        data_type: Ref<NSString>,
+    ) -> ObjBOOL {
         send2::<Raw, Raw, ObjBOOL>(
             self.as_raw(),
             ns_sel!("setString:forType:"),

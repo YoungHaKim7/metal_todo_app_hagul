@@ -456,34 +456,90 @@ mod tests {
         (" lone jung stays", "\u{1161}", "\u{1161}"),
         ("L+V", "\u{1100}\u{1161}", "\u{AC00}"),
         ("L+V+T", "\u{1100}\u{1161}\u{11AB}", "\u{AC04}"),
-        ("hangul", "\u{1112}\u{1161}\u{11AB}\u{1100}\u{1173}\u{1105}", "\u{D55C}\u{AE00}"),
+        (
+            "hangul",
+            "\u{1112}\u{1161}\u{11AB}\u{1100}\u{1173}\u{1105}",
+            "\u{D55C}\u{AE00}",
+        ),
         ("compound T", "\u{1100}\u{1161}\u{1107}\u{1109}", "\u{AC12}"),
-        ("compound T + vowel", "\u{1100}\u{1161}\u{1107}\u{1109}\u{110B}\u{1175}", "\u{AC12}\u{C774}"),
-        ("compound T detach", "\u{1100}\u{1161}\u{1107}\u{1109}\u{1161}", "\u{AC11}\u{C0AC}"),
-        ("simple T detach", "\u{1100}\u{1161}\u{11AB}\u{1161}", "\u{AC00}\u{B098}"),
-        ("T detach gamma", "\u{1100}\u{1161}\u{1106}\u{1161}", "\u{AC00}\u{B9C8}"),
-        ("jong compound", "\u{1100}\u{1161}\u{1100}\u{1109}", "\u{AC03}"),
+        (
+            "compound T + vowel",
+            "\u{1100}\u{1161}\u{1107}\u{1109}\u{110B}\u{1175}",
+            "\u{AC12}\u{C774}",
+        ),
+        (
+            "compound T detach",
+            "\u{1100}\u{1161}\u{1107}\u{1109}\u{1161}",
+            "\u{AC11}\u{C0AC}",
+        ),
+        (
+            "simple T detach",
+            "\u{1100}\u{1161}\u{11AB}\u{1161}",
+            "\u{AC00}\u{B098}",
+        ),
+        (
+            "T detach gamma",
+            "\u{1100}\u{1161}\u{1106}\u{1161}",
+            "\u{AC00}\u{B9C8}",
+        ),
+        (
+            "jong compound",
+            "\u{1100}\u{1161}\u{1100}\u{1109}",
+            "\u{AC03}",
+        ),
         ("cho double", "\u{1100}\u{1100}\u{1161}", "\u{AE4C}"),
         ("ssang", "\u{1109}\u{1109}", "\u{110A}"),
-        ("lone vowel + cons", "\u{1161}\u{1100}\u{1161}", "\u{1161}\u{AC00}"),
+        (
+            "lone vowel + cons",
+            "\u{1161}\u{1100}\u{1161}",
+            "\u{1161}\u{AC00}",
+        ),
         ("vowel compound", "\u{1169}\u{1161}", "\u{116A}"),
         ("mweos", "\u{1106}\u{116E}\u{1165}\u{1109}", "\u{BB63}"),
-        ("mueos", "\u{1106}\u{116E}\u{110B}\u{1165}\u{1109}", "\u{BB34}\u{C5C7}"),
-        ("sagwa", "\u{1109}\u{1161}\u{1100}\u{1169}\u{1161}", "\u{C0AC}\u{ACFC}"),
+        (
+            "mueos",
+            "\u{1106}\u{116E}\u{110B}\u{1165}\u{1109}",
+            "\u{BB34}\u{C5C7}",
+        ),
+        (
+            "sagwa",
+            "\u{1109}\u{1161}\u{1100}\u{1169}\u{1161}",
+            "\u{C0AC}\u{ACFC}",
+        ),
         ("jamo after syllable", "\u{AC00}\u{11AB}", "\u{AC04}"),
-        ("syllable after jamo", "\u{1100}\u{1161}\u{AC00}", "\u{AC00}\u{AC00}"),
+        (
+            "syllable after jamo",
+            "\u{1100}\u{1161}\u{AC00}",
+            "\u{AC00}\u{AC00}",
+        ),
         ("jamo no double", "\u{1100}\u{1102}", "\u{1100}\u{1102}"),
         ("no jong form cho", "\u{1104}\u{1161}", "\u{B530}"),
         ("latin + korean", "ab\u{1100}\u{1161}", "ab\u{AC00}"),
-        ("punct resets", "\u{1100}\u{1161}!\u{1102}\u{1175}", "\u{AC00}!\u{B2C8}"),
+        (
+            "punct resets",
+            "\u{1100}\u{1161}!\u{1102}\u{1175}",
+            "\u{AC00}!\u{B2C8}",
+        ),
         ("space resets", "a \u{1100}\u{1161}", "a \u{AC00}"),
         ("compat jamo", "\u{3142}\u{314F}", "\u{BC14}"),
         ("compat vowel compound", "\u{3157}\u{314F}", "\u{116A}"),
-        ("compat jong after syl", "\u{AC11}\u{3144}", "\u{AC11}\u{11B9}"),
+        (
+            "compat jong after syl",
+            "\u{AC11}\u{3144}",
+            "\u{AC11}\u{11B9}",
+        ),
         ("jong direct w/ V", "\u{1100}\u{1161}\u{11BA}", "\u{AC13}"),
-        ("jong compound direct", "\u{1100}\u{1161}\u{11B8}\u{11BA}", "\u{AC12}"),
+        (
+            "jong compound direct",
+            "\u{1100}\u{1161}\u{11B8}\u{11BA}",
+            "\u{AC12}",
+        ),
         ("idempotent values", "\u{AC12}", "\u{AC12}"),
-        ("idempotent hangul", "\u{D55C}\u{AE00}!", "\u{D55C}\u{AE00}!"),
+        (
+            "idempotent hangul",
+            "\u{D55C}\u{AE00}!",
+            "\u{D55C}\u{AE00}!",
+        ),
     ];
 
     #[test]
@@ -503,13 +559,17 @@ mod tests {
         }
         // The same words as raw jamo streams compose to them. Inputs are
         // built from codepoints to keep the blocks unambiguous.
-        let jamo = |cps: &[u32]| -> String {
-            cps.iter().map(|&c| char::from_u32(c).unwrap()).collect()
-        };
-        assert_eq!(compose(&jamo(&[0x1112, 0x1161, 0x11AB, 0x1100, 0x1173, 0x1105])), "한글");
+        let jamo =
+            |cps: &[u32]| -> String { cps.iter().map(|&c| char::from_u32(c).unwrap()).collect() };
+        assert_eq!(
+            compose(&jamo(&[0x1112, 0x1161, 0x11AB, 0x1100, 0x1173, 0x1105])),
+            "한글"
+        );
         assert_eq!(compose(&jamo(&[0x1100, 0x1161, 0x1107, 0x1109])), "값");
         assert_eq!(
-            compose(&jamo(&[0x110B, 0x1175, 0x1107, 0x1102, 0x1175, 0x1103, 0x1161])),
+            compose(&jamo(&[
+                0x110B, 0x1175, 0x1107, 0x1102, 0x1175, 0x1103, 0x1161
+            ])),
             "입니다"
         );
         assert_eq!(
