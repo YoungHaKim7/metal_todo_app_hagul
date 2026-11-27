@@ -97,63 +97,138 @@ fn parse_list<T>(s: &OsString, f: impl FnMut(&str) -> Option<T>) -> Vec<T> {
 impl Harness {
     /// Read the configuration from the environment.
     pub fn from_env() -> Harness {
-        let mut h = Harness::default();
-        h.frames = var("METAL_GUI_FRAMES").and_then(|v| v.to_string_lossy().parse().ok());
-        h.shot_dir = var("METAL_GUI_SHOT_DIR").map(PathBuf::from);
-        h.shot_frames = var("METAL_GUI_SHOT_FRAMES")
-            .map(|v| parse_list(&v, |p| p.trim().parse().ok()))
-            .unwrap_or_default();
-        h.keys = var("METAL_GUI_KEYS")
-            .map(|v| {
-                parse_list(&v, |p| {
-                    let (a, b) = p.trim().split_once(':')?;
-                    Some(KeyTap {
-                        frame: a.parse().ok()?,
-                        code: b.parse().ok()?,
+        Harness {
+            frames: var("METAL_GUI_FRAMES").and_then(|v| v.to_string_lossy().parse().ok()),
+
+            shot_dir: var("METAL_GUI_SHOT_DIR").map(PathBuf::from),
+
+            shot_frames: var("METAL_GUI_SHOT_FRAMES")
+                .map(|v| parse_list(&v, |p| p.trim().parse().ok()))
+                .unwrap_or_default(),
+
+            keys: var("METAL_GUI_KEYS")
+                .map(|v| {
+                    parse_list(&v, |p| {
+                        let (a, b) = p.trim().split_once(':')?;
+
+                        Some(KeyTap {
+                            frame: a.parse().ok()?,
+                            code: b.parse().ok()?,
+                        })
                     })
                 })
-            })
-            .unwrap_or_default();
-        h.holds = var("METAL_GUI_HOLD")
-            .map(|v| {
-                parse_list(&v, |p| {
-                    let mut it = p.trim().split(':');
-                    let frame = it.next()?.parse().ok()?;
-                    let code = it.next()?.parse().ok()?;
-                    let len = it.next()?.parse().ok()?;
-                    Some((frame, code, len))
-                })
-            })
-            .unwrap_or_default();
-        h.mouse = var("METAL_GUI_MOUSE")
-            .map(|v| {
-                parse_list(&v, |p| {
-                    let mut it = p.trim().split(':');
-                    let frame = it.next()?.parse().ok()?;
-                    let x = it.next()?.parse().ok()?;
-                    let y = it.next()?.parse().ok()?;
-                    let hold_frames = it.next().and_then(|s| s.parse().ok()).unwrap_or(0);
-                    Some(MouseAt {
-                        frame,
-                        x,
-                        y,
-                        hold_frames,
+                .unwrap_or_default(),
+
+            holds: var("METAL_GUI_HOLD")
+                .map(|v| {
+                    parse_list(&v, |p| {
+                        let mut it = p.trim().split(':');
+
+                        let frame = it.next()?.parse().ok()?;
+                        let code = it.next()?.parse().ok()?;
+                        let len = it.next()?.parse().ok()?;
+
+                        Some((frame, code, len))
                     })
                 })
-            })
-            .unwrap_or_default();
-        h.text = var("METAL_GUI_TEXT").and_then(|v| {
-            let v = v.to_string_lossy().into_owned();
-            let (frame, text) = v.split_once(':')?;
-            Some((frame.trim().parse().ok()?, text.to_string()))
-        });
-        h.close_frame = var("METAL_GUI_CLOSE").and_then(|v| v.to_string_lossy().parse().ok());
-        h.name = std::env::current_exe()
-            .ok()
-            .and_then(|p| p.file_stem().map(|s| s.to_string_lossy().into_owned()))
-            .unwrap_or_else(|| "example".to_string());
-        h
+                .unwrap_or_default(),
+
+            mouse: var("METAL_GUI_MOUSE")
+                .map(|v| {
+                    parse_list(&v, |p| {
+                        let mut it = p.trim().split(':');
+
+                        let frame = it.next()?.parse().ok()?;
+                        let x = it.next()?.parse().ok()?;
+                        let y = it.next()?.parse().ok()?;
+
+                        let hold_frames = it.next().and_then(|s| s.parse().ok()).unwrap_or(0);
+
+                        Some(MouseAt {
+                            frame,
+                            x,
+                            y,
+                            hold_frames,
+                        })
+                    })
+                })
+                .unwrap_or_default(),
+
+            text: var("METAL_GUI_TEXT").and_then(|v| {
+                let v = v.to_string_lossy().into_owned();
+                let (frame, text) = v.split_once(':')?;
+
+                Some((frame.trim().parse().ok()?, text.to_string()))
+            }),
+
+            close_frame: var("METAL_GUI_CLOSE").and_then(|v| v.to_string_lossy().parse().ok()),
+
+            name: std::env::current_exe()
+                .ok()
+                .and_then(|p| p.file_stem().map(|s| s.to_string_lossy().into_owned()))
+                .unwrap_or_else(|| "example".to_string()),
+        }
     }
+
+    // /// Read the configuration from the environment.
+    // pub fn from_env() -> Harness {
+    //     let mut h = Harness::default();
+    //     h.frames = var("METAL_GUI_FRAMES").and_then(|v| v.to_string_lossy().parse().ok());
+    //     h.shot_dir = var("METAL_GUI_SHOT_DIR").map(PathBuf::from);
+    //     h.shot_frames = var("METAL_GUI_SHOT_FRAMES")
+    //         .map(|v| parse_list(&v, |p| p.trim().parse().ok()))
+    //         .unwrap_or_default();
+    //     h.keys = var("METAL_GUI_KEYS")
+    //         .map(|v| {
+    //             parse_list(&v, |p| {
+    //                 let (a, b) = p.trim().split_once(':')?;
+    //                 Some(KeyTap {
+    //                     frame: a.parse().ok()?,
+    //                     code: b.parse().ok()?,
+    //                 })
+    //             })
+    //         })
+    //         .unwrap_or_default();
+    //     h.holds = var("METAL_GUI_HOLD")
+    //         .map(|v| {
+    //             parse_list(&v, |p| {
+    //                 let mut it = p.trim().split(':');
+    //                 let frame = it.next()?.parse().ok()?;
+    //                 let code = it.next()?.parse().ok()?;
+    //                 let len = it.next()?.parse().ok()?;
+    //                 Some((frame, code, len))
+    //             })
+    //         })
+    //         .unwrap_or_default();
+    //     h.mouse = var("METAL_GUI_MOUSE")
+    //         .map(|v| {
+    //             parse_list(&v, |p| {
+    //                 let mut it = p.trim().split(':');
+    //                 let frame = it.next()?.parse().ok()?;
+    //                 let x = it.next()?.parse().ok()?;
+    //                 let y = it.next()?.parse().ok()?;
+    //                 let hold_frames = it.next().and_then(|s| s.parse().ok()).unwrap_or(0);
+    //                 Some(MouseAt {
+    //                     frame,
+    //                     x,
+    //                     y,
+    //                     hold_frames,
+    //                 })
+    //             })
+    //         })
+    //         .unwrap_or_default();
+    //     h.text = var("METAL_GUI_TEXT").and_then(|v| {
+    //         let v = v.to_string_lossy().into_owned();
+    //         let (frame, text) = v.split_once(':')?;
+    //         Some((frame.trim().parse().ok()?, text.to_string()))
+    //     });
+    //     h.close_frame = var("METAL_GUI_CLOSE").and_then(|v| v.to_string_lossy().parse().ok());
+    //     h.name = std::env::current_exe()
+    //         .ok()
+    //         .and_then(|p| p.file_stem().map(|s| s.to_string_lossy().into_owned()))
+    //         .unwrap_or_else(|| "example".to_string());
+    //     h
+    // }
 
     /// Is any harness option set (event injection runs)?
     pub fn active(&self) -> bool {
